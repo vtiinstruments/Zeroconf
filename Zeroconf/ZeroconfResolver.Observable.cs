@@ -1,8 +1,6 @@
-﻿using System;
+﻿using R3;
+using System;
 using System.Collections.Generic;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Text;
 
 namespace Zeroconf
@@ -17,7 +15,7 @@ namespace Zeroconf
         /// <param name="retries">If the socket is busy, the number of times the resolver should retry</param>
         /// <param name="retryDelayMilliseconds">The delay time between retries</param>
         /// <returns></returns>
-        public static IObservable<IZeroconfHost> Resolve(string protocol,
+        public static Observable<IZeroconfHost> Resolve(string protocol,
                                                          TimeSpan scanTime = default(TimeSpan),
                                                          int retries = 2,
                                                          int retryDelayMilliseconds = 2000)
@@ -36,7 +34,7 @@ namespace Zeroconf
         /// <param name="retries">If the socket is busy, the number of times the resolver should retry</param>
         /// <param name="retryDelayMilliseconds">The delay time between retries</param>
         /// <returns></returns>
-        public static IObservable<IZeroconfHost> Resolve(IEnumerable<string> protocols,
+        public static Observable<IZeroconfHost> Resolve(IEnumerable<string> protocols,
                                                          TimeSpan scanTime = default(TimeSpan),
                                                          int retries = 2,
                                                          int retryDelayMilliseconds = 2000)
@@ -61,7 +59,7 @@ namespace Zeroconf
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static IObservable<IZeroconfHost> Resolve(ResolveOptions options)
+        public static Observable<IZeroconfHost> Resolve(ResolveOptions options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
@@ -80,7 +78,7 @@ namespace Zeroconf
                     }
                     catch (Exception e)
                     {
-                        obs.OnError(e);
+                        obs.OnErrorResume(e);
                     }
                     finally
                     {
@@ -90,7 +88,7 @@ namespace Zeroconf
                 });
         }
 
-        public static IObservable<DomainService> BrowseDomains(TimeSpan scanTime = default(TimeSpan),
+        public static Observable<DomainService> BrowseDomains(TimeSpan scanTime = default(TimeSpan),
                                                                int retries = 2,
                                                                int retryDelayMilliseconds = 2000)
         {
@@ -109,7 +107,7 @@ namespace Zeroconf
             return BrowseDomains(options);
         }
 
-        public static IObservable<DomainService> BrowseDomains(BrowseDomainsOptions options)
+        public static Observable<DomainService> BrowseDomains(BrowseDomainsOptions options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
@@ -125,7 +123,7 @@ namespace Zeroconf
                     { }
                     catch (Exception e)
                     {
-                        obs.OnError(e);
+                        obs.OnErrorResume(e);
                     }
                     finally
                     {
@@ -139,7 +137,7 @@ namespace Zeroconf
         /// Listens for mDNS Service Announcements
         /// </summary>
         /// <returns></returns>
-        public static IObservable<ServiceAnnouncement> ListenForAnnouncementsAsync()
+        public static Observable<ServiceAnnouncement> ListenForAnnouncementsAsync()
         {
             return Observable.Create<ServiceAnnouncement>(
                 async (obs, cxl) =>
@@ -152,7 +150,7 @@ namespace Zeroconf
                     { }
                     catch (Exception e)
                     {
-                        obs.OnError(e);
+                        obs.OnErrorResume(e);
                     }
                     finally
                     {
@@ -170,7 +168,7 @@ namespace Zeroconf
         /// <param name="retries">If the socket is busy, the number of times the resolver should retry</param>
         /// <param name="retryDelayMilliseconds">The delay time between retries</param>
         /// <returns></returns>
-        public static IObservable<IZeroconfHost> ResolveContinuous(IEnumerable<string> protocols,
+        public static Observable<IZeroconfHost> ResolveContinuous(IEnumerable<string> protocols,
                                                          TimeSpan scanTime = default(TimeSpan),
                                                          int retries = 2,
                                                          int retryDelayMilliseconds = 2000)
@@ -179,9 +177,7 @@ namespace Zeroconf
 
 
             var inner = Resolve(protocols, scanTime, retries, retryDelayMilliseconds);
-
-
-            return inner.Repeat().Distinct();
+            return inner.Distinct();
             
         }
 
@@ -192,7 +188,7 @@ namespace Zeroconf
         /// <param name="protocol"></param>
         /// <param name="retries">If the socket is busy, the number of times the resolver should retry</param>
         /// <param name="retryDelayMilliseconds">The delay time between retries</param>
-        public static IObservable<IZeroconfHost> ResolveContinuous(string protocol,
+        public static Observable<IZeroconfHost> ResolveContinuous(string protocol,
                                                                    TimeSpan scanTime = default(TimeSpan),
                                                                    int retries = 2,
                                                                    int retryDelayMilliseconds = 2000)
@@ -200,12 +196,11 @@ namespace Zeroconf
             return ResolveContinuous(new[] { protocol }, scanTime, retries, retryDelayMilliseconds);
         }
 
-        public static IObservable<DomainService> BrowseDomainsContinuous(TimeSpan scanTime = default(TimeSpan),
+        public static Observable<DomainService> BrowseDomainsContinuous(TimeSpan scanTime = default(TimeSpan),
                                                                              int retries = 2,
                                                                              int retryDelayMilliseconds = 2000)
         {
             return BrowseDomains(scanTime, retries, retryDelayMilliseconds)
-                   .Repeat()
                    .Distinct();
         }
     }
