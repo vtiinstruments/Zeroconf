@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <Authors>Claire Novotny</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>Bonjour support for .NET 9</Description>
+    <Description>Bonjour support for .NET 10</Description>
     <Product>Zeroconf</Product>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
